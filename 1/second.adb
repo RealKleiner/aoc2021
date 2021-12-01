@@ -7,38 +7,32 @@ procedure Second is
 	package Integer_Vector is new 
 		Ada.Containers.Vectors(Index_Type => Natural, Element_Type => Integer);
 
-	function Sum(V : Integer_Vector.Vector; Start : Natural) return Integer is
-		Res : Integer := 0;
+	function Compare_Windows(V	   : Integer_Vector.Vector; 
+							 Index : Natural) return Boolean is
 	begin
-		for I in (V.First_Index+Start) .. (V.First_Index+Start+2) loop
-			Res := Res + V(I);
-		end loop;
-		return Res;
-	end Sum;
+		return V(V.First_Index+(Index - 3)) < V(V.First_Index+Index);
+	end Compare_Windows;
 
 	File : File_Type;
-	Current_Measurment, Last_Measurment, Number_Increases : Integer := 0;
 	Values : Integer_Vector.Vector;
-	Start : Natural := 1;
+	Number_Increases : Integer;
+	Start : Natural := 3;
 
 begin
 	Open(File, In_File, "input");
 
 	while not End_Of_File(File) loop 
-		Get(File, Current_Measurment);
+		Get(File, Number_Increases);
 		Skip_Line(File);
-		Values.Append(Current_Measurment);
+		Values.Append(Number_Increases);
 	end loop;
 	Close(File);
+	Number_Increases := 0;
 
-	Last_Measurment := Sum(Values, 0);
-
-	while Values.Last_Index >= (Start+2) loop
-		Current_Measurment := Sum(Values, Start);
-		if Current_Measurment > Last_Measurment then
+	while Values.Last_Index >= Start loop
+		if Compare_Windows(Values, Start) then
 			Number_Increases := Number_Increases + 1;
 		end if;
-		Last_Measurment := Current_Measurment;
 		Start := Start + 1;
 	end loop;
 	
