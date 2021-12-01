@@ -7,8 +7,8 @@ procedure Second is
 	package Integer_Vector is new 
 		Ada.Containers.Vectors(Index_Type => Natural, Element_Type => Integer);
 
-	function Compare_Windows(V	   : Integer_Vector.Vector; 
-							 Index : Natural) return Boolean is
+	function Compare_Windows(V : Integer_Vector.Vector; 
+							Index : Natural) return Boolean is
 	begin
 		return V(V.First_Index+(Index - 3)) < V(V.First_Index+Index);
 	end Compare_Windows;
