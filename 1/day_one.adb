@@ -3,7 +3,7 @@ with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Command_Line; use Ada.Command_Line;
 
 procedure Day_One is
-	type T_Measurements is
+	type Measurements is
 		array (1 .. 4) of Integer;
 
 	procedure First(Input : in Integer; Increases, Last : in out Integer) is
@@ -15,24 +15,24 @@ procedure Day_One is
 	end First;
 	
 	procedure Second(Input : in Integer; Increases, Count : in out Integer;
-					 Measurements : in out T_Measurements) is
+					 Data : in out Measurements) is
 	begin
 
-		Measurements(Count) := Input;
-		Count := (Count mod T_Measurements'Last) + 1;
+		Data(Count) := Input;
+		Count := (Count mod Measurements'Last) + 1;
 
-		if Input > Measurements(Count) then
+		if Input > Data(Count) then
 			Increases := Increases + 1;
 		end if;
 	end Second;
 
 
 	File : File_Type;
-	Current_Measurement : Integer;
+	Curr_Data : Integer;
 	Part1_Increases : Integer := 0;
-	Part1_Last_Measurement : Integer := Integer'Last;
+	Part1_Last_Data : Integer := Integer'Last;
 	Part2_Increases : Integer := 0;
-	Part2_Measurements : T_Measurements := (Integer'Last, Integer'Last, 
+	Part2_Data : Measurements := (Integer'Last, Integer'Last, 
 											Integer'Last, Integer'Last);
 	Part2_Count : Integer := 1;
 begin
@@ -44,10 +44,10 @@ begin
 	open(File, In_File, Argument(1));
 
 	while not End_Of_File(File) loop
-		Get(File, Current_Measurement);
+		Get(File, Curr_Data);
 		Skip_Line(File);
-		First(Current_Measurement, Part1_Increases, Part1_Last_Measurement);
-		Second(Current_Measurement, Part2_Increases, Part2_Count, Part2_Measurements);
+		First(Curr_Data, Part1_Increases, Part1_Last_Data);
+		Second(Curr_Data, Part2_Increases, Part2_Count, Part2_Data);
 	end loop;
 
 	close (File);
