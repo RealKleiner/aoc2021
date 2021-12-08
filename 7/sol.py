@@ -33,14 +33,6 @@ def part_one(data: dict) -> int:
     return fuel
 
 
-def calc_fuel(start: int, end: int) -> int:
-    res = 0
-    for cost, step in enumerate(range(start, end), 1):
-        res += cost
-
-    return res
-
-
 def part_two(data: dict) -> int:
     start, end = get_endpoints(data)
     fuel = math.inf
@@ -48,7 +40,7 @@ def part_two(data: dict) -> int:
     for pos in range(start, end + 1):
         _fuel = 0
         for key, value in data.items():
-            _fuel += calc_fuel(min(key, pos), max(key, pos)) * value
+            _fuel += sum(range(1, abs(key - pos) + 1)) * value
 
         if _fuel < fuel:
             fuel = _fuel
