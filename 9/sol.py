@@ -1,46 +1,105 @@
 import sys
 
 
-def read_data(file_path: str) -> list:
+class Location:
+    def __init__(self, value: int, index: tuple):
+        self.value = value
+        self.x, self.y = index
+        self.visited = False
+
+    def get_neighbours(self, x_max: int, y_max: int) -> list:
+        out = []
+
+        if self.x - 1 >= 0:
+            out.append((self.x - 1, self.y))
+        if self.x + 1 < x_max:
+            out.append((self.x + 1, self.y))
+        if self.y - 1 >= 0:
+            out.append((self.x, self.y - 1))
+        if self.y + 1 < y_max:
+            out.append((self.x, self.y + 1))
+
+        return out
+
+    def visit(self):
+        self.visited = True
+
+    def reset(self):
+        self.visited = False
+
+    def __lt__(self, other) -> bool:
+        return self.value < other.value
+
+    def __eq__(self, other) -> bool:
+        return self.value == other.value
+
+    def __gt__(self, other) -> bool:
+        return not (self == other and self < other)
+
+    def __str__(self) -> str:
+        return f"({self.x}, {self.y})"
+
+
+class Cave:
+    def __init__(self, data: list):
+        self.cave = {}
+        self.x_max = len(data[0])
+        self.y_max = len(data)
+
+        for y, row in enumerate(data):
+            for x, cell in enumerate(row):
+                self.cave[(x, y)] = Location(cell, (x, y))
+
+    def get_lowest_points(self) -> list:
+        out = []
+        for key, item in self.cave.items():
+            neighbours = [
+                self.cave[loc] for loc in item.get_neighbours(self.x_max, self.y_max)
+            ]
+            if item < min(neighbours):
+                out.append(item)
+        return out
+
+    def get_basin(self, loc: Location) -> list:
+        if loc.value > 8:
+            return []
+
+        out = [loc]
+        loc.visit()
+        for _loc in loc.get_neighbours(self.x_max, self.y_max):
+            if (
+                not self.cave[_loc].visited
+                and self.cave[_loc].value > loc.value
+                and self.cave[_loc].value != 9
+            ):
+                out += self.get_basin(self.cave[_loc])
+
+        return out
+
+
+def calc_point_values(locs: list) -> int:
+    return sum([loc.value for loc in locs]) + len(locs)
+
+
+def read_data(file_path: str) -> Cave:
     with open(file_path) as f:
-        return [[int(x) for x in line] for line in f.read().split("\n")[:-1]]
+        points = [[int(x) for x in line] for line in f.read().split("\n")][:-1]
+        return Cave(points)
 
 
-def get_neighbours(index: tuple, data: list) -> list:
-    y, x = index
-
-    if y == 0 and x == 0:
-        return [data[0][1], data[1][0]]
-    elif y == 0 and x == len(list[0]) - 1:
-        return [data[0][-2], data[1][-1]]
-    elif y == len(data) - 1 and x == 0:
-        return [data[-1][1], data[-2][0]]
-    elif y == len(data) - 1 and x == len(data[0]) - 1:
-        return [data[-1][-2], data[-2][-1]]
-
-    if y == 0:
-        return [data[y][x - 1], data[y][x + 1], data[y + 1][x]]
-    elif y == len(data) - 1:
-        return [data[y][x - 1], data[y][x + 1], data[y - 1][x]]
-
-    if x == 0:
-        return [data[y][x + 1], data[y + 1][x], data[y - 1][x]]
-    elif x == len(data[0]) - 1:
-        return [data[y][x - 1], data[y + 1][x], data[y - 1][x]]
-
-    return [data[y + 1][x], data[y - 1][x], data[y][x + 1], data[y][x - 1]]
+def part_one(data: Cave) -> int:
+    points = data.get_lowest_points()
+    return calc_point_values(points)
 
 
-def check_if_lowest(loc: int, neighbours: list) -> bool:
-    return loc < min(neighbours)
+def part_two(data: Cave) -> int:
+    lowest = data.get_lowest_points()
+    basins = []
+    for loc in lowest:
+        basins.append(data.get_basin(loc))
 
-
-def part_one(data: list) -> int:
-    return 0
-
-
-def part_two(data: list) -> int:
-    return 0
+    basins = sorted(basins, key=len)
+    return len(basins[-1]) * len(basins[-2]) * len(basins[-3])
 
 
 def main(file_path: str = "input"):
