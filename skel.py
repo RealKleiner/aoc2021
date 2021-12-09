@@ -2,11 +2,8 @@ import sys
 
 
 def read_data(file_path: str) -> list:
-    out = []
     with open(file_path) as f:
-        out = f.read()
-
-    return out
+        return f.read().split()
 
 
 def part_one(data: list) -> int:
