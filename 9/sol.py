@@ -24,9 +24,6 @@ class Location:
     def visit(self):
         self.visited = True
 
-    def reset(self):
-        self.visited = False
-
     def __lt__(self, other) -> bool:
         return self.value < other.value
 
