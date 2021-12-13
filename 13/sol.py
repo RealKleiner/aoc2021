@@ -34,11 +34,8 @@ def fold(index: int, horizontal_fold: bool, points: dict) -> dict:
     d = {}
     for point in points:
         if point[p_i] > index:
-            if point[p_i] % index == 0:
-                _i = 0
-            else:
-                _i = index - (point[p_i] % index)
 
+            _i = index * 2 - point[p_i]
             if horizontal_fold:
                 _point = point[0], _i
             else:
